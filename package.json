@@ -1,6 +1,7 @@
 {
   "name": "account-management-fullstack-level-2",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "build:backend": "dotnet build app-backend/backend.sln",
     "build:frontend": "cd app-react && npm install && npm run build",
