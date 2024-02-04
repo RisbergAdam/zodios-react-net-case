@@ -39,7 +39,6 @@ const TransactionForm = () => {
             },
             {
               onSuccess: () => {
-                console.log({ values });
                 queryClient.invalidateQueries();
                 form.resetForm();
               },
@@ -54,6 +53,7 @@ const TransactionForm = () => {
               <input
                 type="text"
                 name="account_id"
+                data-type="account-id"
                 className="input"
                 placeholder="00000000-0000-0000-0000-000000000000"
                 onChange={form.handleChange}
@@ -70,6 +70,7 @@ const TransactionForm = () => {
               <input
                 type="text"
                 name="amount"
+                data-type="amount"
                 className="input"
                 placeholder="00"
                 onChange={form.handleChange}
@@ -83,6 +84,7 @@ const TransactionForm = () => {
 
             <div className="field">
               <button
+                data-type="transaction-submit"
                 className={clsx(
                   "button",
                   "is-link",

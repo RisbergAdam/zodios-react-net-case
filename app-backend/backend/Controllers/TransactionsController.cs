@@ -1,5 +1,6 @@
 using backend.Models.Api;
 using backend.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -34,16 +35,16 @@ namespace backend.Controllers
         }
 
         [HttpPost]
-        public async Task<TransactionDto> CreateTransaction([FromBody] CreateTransactionRequestDto request, CancellationToken ct)
+        public async Task<IActionResult> CreateTransaction([FromBody] CreateTransactionRequestDto request, CancellationToken ct)
         {
             var tx = await _accountingService.CreateTransaction(request.AccountId, request.Amount, ct);
-            return new TransactionDto
+            return Created(tx.Id.ToString(), new TransactionDto
             {
                 TransactionId = tx.Id,
                 AccountId = tx.Account.Id,
                 Amount = tx.Amount,
                 CreatedAt = tx.CreatedAt
-            };
+            });
         }
 
         [HttpGet("{transactionId}")]
