@@ -7,14 +7,18 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 
 import { apiHooks } from "./api";
 
+const MAX_32_BIT_SIGNED_NUM = 2 ** 31 - 1;
+
 const formSchema = toFormikValidationSchema(
   z.object({
-    account_id: z.string().uuid({
+    account_id: z.string().trim().uuid({
       message: "Account must be a valid UUID",
     }),
-    amount: z.coerce.number({
-      invalid_type_error: "Amount must be a number",
-    }),
+    amount: z.coerce
+      .number({ invalid_type_error: "Amount must an integer" })
+      .int({ message: "Amount must be an integer" })
+      .max(MAX_32_BIT_SIGNED_NUM, { message: "Amount too large" })
+      .min(-MAX_32_BIT_SIGNED_NUM, { message: "Amount too small" }),
   })
 );
 
@@ -30,11 +34,12 @@ const TransactionForm = () => {
         onSubmit={(values, form) =>
           createTransaction.mutate(
             {
-              account_id: values.account_id,
+              account_id: values.account_id.trim(),
               amount: parseInt(values.amount),
             },
             {
               onSuccess: () => {
+                console.log({ values });
                 queryClient.invalidateQueries();
                 form.resetForm();
               },
@@ -66,6 +71,7 @@ const TransactionForm = () => {
                 type="text"
                 name="amount"
                 className="input"
+                placeholder="00"
                 onChange={form.handleChange}
                 onBlur={form.handleBlur}
                 value={form.values.amount}
@@ -82,7 +88,7 @@ const TransactionForm = () => {
                   "is-link",
                   createTransaction.isLoading && "is-loading"
                 )}
-                disabled={!form.isValid}
+                disabled={!form.isValid || !form.dirty}
               >
                 Create transaction
               </button>
