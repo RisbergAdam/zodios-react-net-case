@@ -1,9 +1,11 @@
+using backend.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
-using backend.Services;
 
 namespace backend
 {
@@ -22,6 +24,18 @@ namespace backend
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
                 });
+
+
+            services.AddDbContext<AccountingContext>(options =>
+            {
+                options
+                    .UseInMemoryDatabase("accounting_db")
+                    .ConfigureWarnings(warnings =>
+                    {
+                        warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning);
+                    });
+
+            });
 
             services.AddScoped<IAccountingService, AccountingService>();
         }

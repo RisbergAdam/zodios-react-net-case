@@ -1,5 +1,7 @@
 ﻿using backend.Models;
+using backend.Models.Api;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -23,61 +25,72 @@ namespace backend.Services
     public class AccountingService : IAccountingService
     {
 
+        private AccountingContext _dbContext;
+
+        public AccountingService(AccountingContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         public async Task<IEnumerable<Account>> ListAccounts(CancellationToken ct)
         {
-            return new List<Account>
-            {
-                new() {
-                    AccountId = Guid.Parse("53ee34b0-d558-4fbf-ae78-6e85c9ded528"),
-                    Balance = 1000
-                }
-            };
+            return await _dbContext.Accounts.ToListAsync(ct);
         }
 
 
         public async Task<Account> GetAccount(Guid accountId, CancellationToken ct)
         {
-            return new()
-            {
-                AccountId = accountId,
-                Balance = 1000
-            };
+            return await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId, ct);
         }
 
         public async Task<IEnumerable<Transaction>> ListTransactions(CancellationToken ct)
         {
-            return new List<Transaction>
-            {
-                new() {
-                    TransactionId = Guid.Parse("c7b5118b-5272-4d26-bdee-34a4a7b876e2"),
-                    AccountId = Guid.Parse("53ee34b0-d558-4fbf-ae78-6e85c9ded528"),
-                    Amount = 1000,
-                    CreatedAt = DateTimeOffset.Parse("2024-02-04T15:54:15Z")
-                }
-            };
+            return await _dbContext.Transactions
+                .Include(tx => tx.Account)
+                .ToListAsync(ct);
         }
 
         public async Task<Transaction> CreateTransaction(Guid accountId, int amount, CancellationToken ct)
         {
-            return new()
+            // Use transaction to prevent concurrent updates to account balance.
+            using var tx = await _dbContext.Database.BeginTransactionAsync(ct);
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(acc => acc.Id == accountId, ct);
+
+            if (account == null)
             {
-                TransactionId = Guid.Parse("c7b5118b-5272-4d26-bdee-34a4a7b876e2"),
-                AccountId = accountId,
+                account = new Account
+                {
+                    Id = accountId,
+                    Balance = amount,
+                    Transactions = new List<Transaction>()
+                };
+
+                await _dbContext.Accounts.AddAsync(account, ct);
+            }
+
+            var newTransaction = new Transaction()
+            {
+                Id = Guid.NewGuid(),
                 Amount = amount,
                 CreatedAt = DateTimeOffset.Parse("2024-02-04T15:54:15Z")
             };
+
+            account.Balance += newTransaction.Amount;
+            account.Transactions.Add(newTransaction);
+
+            await _dbContext.Transactions.AddAsync(newTransaction, ct);
+            await _dbContext.SaveChangesAsync(ct);
+            await tx.CommitAsync(ct);
+
+            return newTransaction;
         }
 
         [HttpGet("{transactionId}")]
         public async Task<Transaction> GetTransaction(Guid transactionId, CancellationToken ct)
         {
-            return new()
-            {
-                TransactionId = transactionId,
-                AccountId = Guid.Parse("53ee34b0-d558-4fbf-ae78-6e85c9ded528"),
-                Amount = 1000,
-                CreatedAt = DateTimeOffset.Parse("2024-02-04T15:54:15Z")
-            };
+            return await _dbContext.Transactions
+                .Include(tx => tx.Account)
+                .FirstOrDefaultAsync(tx => tx.Id == transactionId, ct);
         }
 
     }
