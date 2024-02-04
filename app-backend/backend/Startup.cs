@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json;
+using backend.Services;
 
 namespace backend
 {
@@ -21,6 +22,8 @@ namespace backend
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
                 });
+
+            services.AddScoped<IAccountingService, AccountingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

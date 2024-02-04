@@ -1,5 +1,6 @@
 using backend.Models;
 using backend.Models.Api;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,22 +13,29 @@ namespace backend.Controllers
     [Route("[controller]")]
     public class TransactionsController : Controller
     {
+        private IAccountingService _accountingService;
+
+        public TransactionsController(IAccountingService accountingService)
+        {
+            _accountingService = accountingService;
+        }
+
         [HttpGet]
         public Task<IEnumerable<Transaction>> ListTransactions(CancellationToken ct)
         {
-            throw new NotImplementedException();
+            return _accountingService.ListTransactions(ct);
         }
 
         [HttpPost]
-        public Task<ActionResult<Transaction>> CreateTransaction([FromBody] CreateTransactionRequestDto request, CancellationToken ct)
+        public Task<Transaction> CreateTransaction([FromBody] CreateTransactionRequestDto request, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            return _accountingService.CreateTransaction(request.AccountId, request.Amount, ct);
         }
 
         [HttpGet("{transactionId}")]
         public Task<Transaction> GetTransaction([FromRoute] Guid transactionId, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            return _accountingService.GetTransaction(transactionId, ct);
         }
     }
 }
