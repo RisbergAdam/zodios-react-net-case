@@ -32,6 +32,16 @@ const api = new Zodios("http://localhost:5000/", [
     path: "/transactions",
     alias: "createTransaction",
     response: Transaction,
+    parameters: [
+      {
+        name: "transaction",
+        type: "Body",
+        schema: z.object({
+          account_id: z.string(),
+          amount: z.number(),
+        }),
+      },
+    ],
   },
   {
     method: "get",
