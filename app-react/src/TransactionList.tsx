@@ -1,6 +1,8 @@
 import React from "react";
 import { apiHooks } from "./api";
 
+export const formatCurrency = (amount: number) => `${amount}$`;
+
 const TransactionList = () => {
   const transactionsQuery = apiHooks.useListTransactions();
   const accountsQuery = apiHooks.useListAccounts();
@@ -47,15 +49,19 @@ const TransactionList = () => {
               </p>
 
               <p className="ml-auto">
-                <b className="is-family-monospace">{tx.amount}$</b>
+                <b className="is-family-monospace">
+                  {formatCurrency(tx.amount)}
+                </b>
               </p>
 
-              {isFirst && (
+              {isFirst && account && (
                 <>
                   <div style={{ flexBasis: "100% " }} />
                   <p className="has-text-info">
                     Current account balance:{" "}
-                    <b className="is-family-monospace">{account?.balance}$</b>
+                    <b className="is-family-monospace">
+                      {formatCurrency(account.balance)}
+                    </b>
                   </p>
                 </>
               )}
