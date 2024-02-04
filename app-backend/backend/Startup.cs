@@ -22,6 +22,7 @@ namespace backend
                 .AddControllers()
                 .AddJsonOptions(options =>
                 {
+                    // Parses requests & serializes responses using snake_case.
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
                 });
 
@@ -32,6 +33,7 @@ namespace backend
                     .UseInMemoryDatabase("accounting_db")
                     .ConfigureWarnings(warnings =>
                     {
+                        // In-memory db does not support transactions and throws exceptions if warnings are not ignored.
                         warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning);
                     });
 
