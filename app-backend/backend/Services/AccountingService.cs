@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -47,6 +48,7 @@ namespace backend.Services
         {
             return await _dbContext.Transactions
                 .Include(tx => tx.Account)
+                .OrderByDescending(tx => tx.CreatedAt)
                 .ToListAsync(ct);
         }
 
@@ -71,12 +73,12 @@ namespace backend.Services
             var newTransaction = new Transaction()
             {
                 Id = Guid.NewGuid(),
+                Account = account,
                 Amount = amount,
-                CreatedAt = DateTimeOffset.Parse("2024-02-04T15:54:15Z")
+                CreatedAt = DateTimeOffset.Now
             };
 
             account.Balance += newTransaction.Amount;
-            account.Transactions.Add(newTransaction);
 
             await _dbContext.Transactions.AddAsync(newTransaction, ct);
             await _dbContext.SaveChangesAsync(ct);
