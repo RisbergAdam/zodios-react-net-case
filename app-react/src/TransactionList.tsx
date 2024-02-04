@@ -1,51 +1,68 @@
 import React from "react";
+import { apiHooks } from "./api";
 
 const TransactionList = () => {
-  const transactions = [
-    {
-      transactionId: "06400aac-0646-4ba8-9aa5-6d4acaac0583",
-      accountId: "7c5b3b16-a029-4161-96d0-356ad527517d",
-      amount: 1000,
-      createdAt: "2024-02-04T17:43:51Z",
-    },
-    {
-      transactionId: "06400aac-0646-4ba8-9aa5-6d4acaac0583",
-      accountId: "7c5b3b16-a029-4161-96d0-356ad527517d",
-      amount: 1000,
-      createdAt: "2024-02-04T17:43:51Z",
-    },
-    {
-      transactionId: "06400aac-0646-4ba8-9aa5-6d4acaac0583",
-      accountId: "7c5b3b16-a029-4161-96d0-356ad527517d",
-      amount: 1000,
-      createdAt: "2024-02-04T17:43:51Z",
-    },
-  ];
+  const transactionsQuery = apiHooks.useListTransactions();
+  const accountsQuery = apiHooks.useListAccounts();
+
+  if (transactionsQuery.isLoading || accountsQuery.isLoading) {
+    return (
+      <div>
+        <p className="mb-2">
+          <b>Transaction history loading</b>
+        </p>
+      </div>
+    );
+  }
+
+  if (!transactionsQuery.data || !accountsQuery.data) {
+    return (
+      <div>
+        <p className="mb-2">
+          <b>Transaction history error</b>
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
       <p className="mb-2">
         <b>Transaction history</b>
       </p>
-
       <nav className="panel">
-        {transactions.map((tx) => (
-          <a className="panel-block is-flex-wrap-wrap">
-            <p>
-              Account: <b className="is-family-monospace">{tx.accountId}</b>
-            </p>
+        {transactionsQuery.data.map((tx, i) => {
+          const isFirst = i === 0;
+          const account = accountsQuery.data.find(
+            (acc) => acc.account_id === tx.account_id
+          );
 
-            <p className="ml-auto">
-              <b className="is-family-monospace">{tx.amount}$</b>
-            </p>
+          return (
+            <a
+              className="panel-block is-flex-wrap-wrap"
+              key={tx.transaction_id}
+              href="/#"
+            >
+              <p>
+                Account: <b className="is-family-monospace">{tx.account_id}</b>
+              </p>
 
-            <div style={{ flexBasis: "100% " }} />
-            <p className="has-text-info">
-              Current account balance:{" "}
-              <b className="is-family-monospace">1000$</b>
-            </p>
-          </a>
-        ))}
+              <p className="ml-auto">
+                <b className="is-family-monospace">{tx.amount}$</b>
+              </p>
+
+              {isFirst && (
+                <>
+                  <div style={{ flexBasis: "100% " }} />
+                  <p className="has-text-info">
+                    Current account balance:{" "}
+                    <b className="is-family-monospace">{account?.balance}$</b>
+                  </p>
+                </>
+              )}
+            </a>
+          );
+        })}
       </nav>
     </div>
   );
