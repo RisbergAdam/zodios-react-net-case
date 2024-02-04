@@ -38,10 +38,9 @@ const TransactionList = () => {
           );
 
           return (
-            <a
+            <div
               className="panel-block is-flex-wrap-wrap"
               key={tx.transaction_id}
-              href="/#"
             >
               <p>
                 Account: <b className="is-family-monospace">{tx.account_id}</b>
@@ -60,7 +59,7 @@ const TransactionList = () => {
                   </p>
                 </>
               )}
-            </a>
+            </div>
           );
         })}
       </nav>
