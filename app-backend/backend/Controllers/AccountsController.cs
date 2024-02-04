@@ -1,8 +1,9 @@
-﻿using backend.Models;
+﻿using backend.Models.Api;
 using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,15 +22,25 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public Task<IEnumerable<Account>> ListAaccounts(CancellationToken ct)
+        public async Task<IEnumerable<AccountDto>> ListAaccounts(CancellationToken ct)
         {
-            return _accountingService.ListAccounts(ct);
+            var accounts = await _accountingService.ListAccounts(ct);
+            return accounts.Select(acc => new AccountDto
+            {
+                AccountId = acc.Id,
+                Balance = acc.Balance
+            });
         }
 
         [HttpGet("{accountId}")]
-        public Task<Account> GetAccount([FromRoute] Guid accountId, CancellationToken ct)
+        public async Task<AccountDto> GetAccount([FromRoute] Guid accountId, CancellationToken ct)
         {
-            return _accountingService.GetAccount(accountId, ct);
+            var acc = await _accountingService.GetAccount(accountId, ct);
+            return acc == null ? null : new AccountDto
+            {
+                AccountId = acc.Id,
+                Balance = acc.Balance
+            };
         }
     }
 }
