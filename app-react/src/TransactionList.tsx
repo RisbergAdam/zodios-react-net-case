@@ -42,6 +42,10 @@ const TransactionList = () => {
           return (
             <div
               className="panel-block is-flex-wrap-wrap"
+              data-type="transaction"
+              data-account-id={tx.account_id}
+              data-amount={tx.amount}
+              data-balance={account?.balance ?? 0}
               key={tx.transaction_id}
             >
               <p>

@@ -63,7 +63,7 @@ namespace backend.Services
                 account = new Account
                 {
                     Id = accountId,
-                    Balance = amount,
+                    Balance = 0,
                     Transactions = new List<Transaction>()
                 };
 
