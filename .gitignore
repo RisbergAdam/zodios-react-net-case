@@ -3,5 +3,7 @@ cypress/videos
 cypress/plugins
 cypress/screenshots
 cypress/support
-
 .idea
+app-backend/.vs
+app-backend/backend/bin
+app-backend/backend/obj
