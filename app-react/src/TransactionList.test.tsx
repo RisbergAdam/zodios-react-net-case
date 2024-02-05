@@ -9,6 +9,7 @@ const queryClient = new QueryClient({
   logger: {
     log: console.log,
     warn: console.warn,
+    // silence annoying error logs since we are testing 500 responses
     error: () => {},
   },
   defaultOptions: {
@@ -83,13 +84,19 @@ describe("TransactionList", () => {
             transaction_id: "ec326214-957c-4014-a210-55f93996dffd",
             account_id: "2ef41f70-364b-4e09-8184-7d97ad6c507c",
             amount: 1500,
-            created_at: "2024-02-05T09:38:24Z",
+            created_at: "2024-02-05T10:00:00Z",
           },
           {
             transaction_id: "35a877bb-52dc-434d-8825-84cbd4cac9a4",
             account_id: "2ef41f70-364b-4e09-8184-7d97ad6c507c",
             amount: 500,
-            created_at: "2024-02-05T09:38:24Z",
+            created_at: "2024-02-05T09:00:00Z",
+          },
+          {
+            transaction_id: "aab7c33f-e5f1-47f5-98f5-2657bdab3a4e",
+            account_id: "b290438b-a647-4a92-a814-e1465403f141",
+            amount: 100,
+            created_at: "2024-02-05T08:00:00Z",
           },
         ],
       });
@@ -97,6 +104,10 @@ describe("TransactionList", () => {
       moxios.stubRequest("/accounts", {
         status: 200,
         response: [
+          {
+            account_id: "b290438b-a647-4a92-a814-e1465403f141",
+            balance: 100,
+          },
           {
             account_id: "2ef41f70-364b-4e09-8184-7d97ad6c507c",
             balance: 2000,
@@ -114,6 +125,10 @@ describe("TransactionList", () => {
         "transaction-35a877bb-52dc-434d-8825-84cbd4cac9a4"
       );
 
+      const tx3 = await screen.findByTestId(
+        "transaction-aab7c33f-e5f1-47f5-98f5-2657bdab3a4e"
+      );
+
       // assert first transaction
 
       expect(tx1).toHaveTextContent("1500$");
@@ -128,7 +143,15 @@ describe("TransactionList", () => {
       expect(tx2).toHaveTextContent(
         "Account: 2ef41f70-364b-4e09-8184-7d97ad6c507c"
       );
-      expect(tx2).not.toHaveTextContent("Current account balance: 2000$");
+      expect(tx2).not.toHaveTextContent("Current account balance:");
+
+      // assert third transaction
+
+      expect(tx3).toHaveTextContent("100$");
+      expect(tx3).toHaveTextContent(
+        "Account: b290438b-a647-4a92-a814-e1465403f141"
+      );
+      expect(tx3).not.toHaveTextContent("Current account balance:");
     });
   });
 });
