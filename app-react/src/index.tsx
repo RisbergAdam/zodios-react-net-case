@@ -7,7 +7,13 @@ import "bulma/css/bulma.min.css";
 import { TransactionForm } from "./TransactionForm";
 import { TransactionList } from "./TransactionList";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 3,
+    },
+  },
+});
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
