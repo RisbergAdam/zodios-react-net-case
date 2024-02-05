@@ -82,6 +82,12 @@ const TransactionForm = () => {
               )}
             </div>
 
+            {createTransaction.isError && (
+              <div className="notification is-danger">
+                Could not create a transaction, please try again.
+              </div>
+            )}
+
             <div className="field">
               <button
                 data-type="transaction-submit"
