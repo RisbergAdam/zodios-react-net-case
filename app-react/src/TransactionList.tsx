@@ -63,6 +63,7 @@ const TransactionList = () => {
                 data-amount={tx.amount}
                 data-balance={account?.balance ?? 0}
                 key={tx.transaction_id}
+                data-testid={`transaction-${tx.transaction_id}`}
               >
                 <p>
                   Account:{" "}

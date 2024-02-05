@@ -14,7 +14,7 @@ const Account = z.object({
   balance: z.number(),
 });
 
-const api = new Zodios("http://localhost:5000/", [
+export const api = new Zodios("http://localhost:5000/", [
   {
     method: "get",
     path: "/transactions",
