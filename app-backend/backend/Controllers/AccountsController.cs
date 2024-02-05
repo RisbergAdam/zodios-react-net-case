@@ -1,5 +1,6 @@
 ﻿using backend.Models.Api;
 using backend.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -33,14 +34,21 @@ namespace backend.Controllers
         }
 
         [HttpGet("{accountId}")]
-        public async Task<AccountDto> GetAccount([FromRoute] Guid accountId, CancellationToken ct)
+        public async Task<IActionResult> GetAccount([FromRoute] Guid accountId, CancellationToken ct)
         {
             var acc = await _accountingService.GetAccount(accountId, ct);
-            return acc == null ? null : new AccountDto
+            if (acc == null)
             {
-                AccountId = acc.Id,
-                Balance = acc.Balance
-            };
+                return NotFound();
+            }
+            else
+            {
+                return Ok(new AccountDto
+                {
+                    AccountId = acc.Id,
+                    Balance = acc.Balance
+                });
+            }
         }
     }
 }

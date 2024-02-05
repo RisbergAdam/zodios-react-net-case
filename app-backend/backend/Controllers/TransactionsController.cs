@@ -48,16 +48,23 @@ namespace backend.Controllers
         }
 
         [HttpGet("{transactionId}")]
-        public async Task<TransactionDto> GetTransaction([FromRoute] Guid transactionId, CancellationToken ct)
+        public async Task<IActionResult> GetTransaction([FromRoute] Guid transactionId, CancellationToken ct)
         {
             var tx = await _accountingService.GetTransaction(transactionId, ct);
-            return tx == null ? null : new TransactionDto
+            if (tx == null)
             {
-                TransactionId = tx.Id,
-                AccountId = tx.Account.Id,
-                Amount = tx.Amount,
-                CreatedAt = tx.CreatedAt
-            };
+                return NotFound();
+            }
+            else
+            {
+                return Ok(new TransactionDto
+                {
+                    TransactionId = tx.Id,
+                    AccountId = tx.Account.Id,
+                    Amount = tx.Amount,
+                    CreatedAt = tx.CreatedAt
+                });
+            }
         }
     }
 }
