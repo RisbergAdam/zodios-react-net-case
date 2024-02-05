@@ -1,6 +1,4 @@
 ﻿using backend.Models;
-using backend.Models.Api;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -87,7 +85,6 @@ namespace backend.Services
             return newTransaction;
         }
 
-        [HttpGet("{transactionId}")]
         public async Task<Transaction> GetTransaction(Guid transactionId, CancellationToken ct)
         {
             return await _dbContext.Transactions

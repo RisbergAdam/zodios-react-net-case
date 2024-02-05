@@ -39,6 +39,7 @@ const TransactionForm = () => {
             },
             {
               onSuccess: () => {
+                // Refetch transaction list
                 queryClient.invalidateQueries();
                 form.resetForm();
               },

@@ -61,9 +61,9 @@ const TransactionList = () => {
                 data-type="transaction"
                 data-account-id={tx.account_id}
                 data-amount={tx.amount}
-                data-balance={account?.balance ?? 0}
                 key={tx.transaction_id}
                 data-testid={`transaction-${tx.transaction_id}`}
+                {...(account && { "data-balance": account.balance })}
               >
                 <p>
                   Account:{" "}
@@ -78,7 +78,7 @@ const TransactionList = () => {
 
                 {isFirst && account && (
                   <>
-                    <div style={{ flexBasis: "100% " }} />
+                    <div style={{ flexBasis: "100%" }} />
                     <p className="has-text-info">
                       Current account balance:{" "}
                       <b className="is-family-monospace">
